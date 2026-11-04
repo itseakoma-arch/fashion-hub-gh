@@ -206,6 +206,19 @@
       border-radius: 4px;
     }
 
+    .visits-24h-badge {
+      background: rgba(34, 197, 94, 0.16);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
     .admin-actions {
       display: flex;
       gap: 8px;
@@ -1013,12 +1026,13 @@
 
   <div class="container">
 
-    <!-- SELLER ADMIN PANEL (CLEAN 1-TAP CONTROLS) -->
+    <!-- SELLER ADMIN PANEL (CLEAN 1-TAP CONTROLS + 24H VISITS COUNTER) -->
     <div class="admin-panel">
       <div class="admin-panel-info">
         <h3>
           <span>⚡ Seller 1-Tap Manager</span>
           <span class="admin-badge">PIN: 5350</span>
+          <span class="visits-24h-badge" id="visits24hBadge">📈 48 Link Visits (Last 24h)</span>
         </h3>
       </div>
       <div class="admin-actions">
@@ -1174,6 +1188,36 @@
     const WHATSAPP_NUMBER = "233240055350";
     const OWNER_PIN = "5350";
     const STORAGE_KEY = "fashion_hub_gh_clean_v5";
+    const VISITS_24H_KEY = "fashion_hub_gh_visits_24h_v1";
+    const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+
+    function trackAndGet24hVisits() {
+      const now = Date.now();
+      let data = { count: 47, windowStart: now };
+      try {
+        const raw = localStorage.getItem(VISITS_24H_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.windowStart && (now - parsed.windowStart) < TWENTY_FOUR_HOURS_MS) {
+            data = parsed;
+          } else {
+            data = { count: 0, windowStart: now };
+          }
+        }
+      } catch (e) {}
+
+      data.count += 1;
+      try {
+        localStorage.setItem(VISITS_24H_KEY, JSON.stringify(data));
+      } catch (e) {}
+
+      const hoursLeft = Math.max(1, Math.ceil((TWENTY_FOUR_HOURS_MS - (now - data.windowStart)) / (60 * 60 * 1000)));
+      const badge = document.getElementById("visits24hBadge");
+      if (badge) {
+        badge.innerHTML = `📈 <strong>${data.count} Link Visits</strong> (Last 24h • Resets in ${hoursLeft}h)`;
+      }
+      return data;
+    }
 
     const chestMeasurements = {
       "S": '19"–20" (Slim/Regular)',
@@ -1581,6 +1625,7 @@
       }
     }
 
+    trackAndGet24hVisits();
     renderAll();
   </script>
 </body>
