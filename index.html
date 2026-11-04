@@ -12,7 +12,7 @@
       --bg-page: #ede3d7;       /* Warm light brown / sand */
       --bg-card: #f9f5f0;       /* Soft warm cream-brown card */
       --bg-tan: #e3d5c5;        /* Deeper latte tan for pills/boxes */
-      --espresso: #211813;      /* Rich dark espresso instead of harsh black */
+      --espresso: #211813;      /* Rich dark espresso */
       --brown-sub: #6b584c;     /* Muted warm brown text */
       --caramel: #9c6b3b;       /* Warm caramel accent */
       --sold-red: #dc2626;      /* Bright bold red for SOLD OUT */
@@ -126,7 +126,7 @@
       display: block;
     }
 
-    /* MODE SWITCHER */
+    /* MODE SWITCHER WITH NOTIFICATION BADGE */
     .mode-switch {
       display: flex;
       background: var(--bg-tan);
@@ -136,6 +136,7 @@
     }
 
     .mode-tab {
+      position: relative;
       border: none;
       background: transparent;
       color: var(--brown-sub);
@@ -146,11 +147,35 @@
       border-radius: 6px;
       cursor: pointer;
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
     }
 
     .mode-tab.active {
       background: var(--espresso);
       color: #fff;
+    }
+
+    .notif-count-badge {
+      background: var(--sold-red);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 900;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 99px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      animation: popIn 0.25s ease;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.6); }
+      70% { transform: scale(1.18); }
+      100% { transform: scale(1); }
     }
 
     /* MAIN CONTAINER */
@@ -170,18 +195,24 @@
       }
     }
 
-    /* SELLER ADMIN PANEL (MINIMAL & CLEAN) */
+    /* SELLER ADMIN PANEL + LIVE ACTIVITY RADAR */
     .admin-panel {
       display: none;
       background: var(--espresso);
       color: #fff;
-      border-radius: 10px;
-      padding: 14px 16px;
+      border-radius: 12px;
+      padding: 16px;
       margin-top: 12px;
       border-left: 4px solid var(--sold-red);
+      flex-direction: column;
+      gap: 14px;
     }
 
     body.seller-mode .admin-panel {
+      display: flex;
+    }
+
+    .admin-top-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -190,11 +221,12 @@
     }
 
     .admin-panel-info h3 {
-      font-size: 14px;
+      font-size: 14.5px;
       font-weight: 800;
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
     .admin-badge {
@@ -203,6 +235,31 @@
       font-size: 10px;
       padding: 2px 7px;
       border-radius: 4px;
+    }
+
+    .live-radar-badge {
+      background: rgba(34, 197, 94, 0.18);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 99px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .radar-dot {
+      width: 6px;
+      height: 6px;
+      background: #4ade80;
+      border-radius: 50%;
+      animation: blink 1.4s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
 
     .admin-actions {
@@ -252,6 +309,153 @@
       font-size: 12px;
       border-radius: 6px;
       cursor: pointer;
+    }
+
+    /* LIVE ANALYTICS KPI GRID IN ADMIN */
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    @media (max-width: 640px) {
+      .admin-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .stat-tile {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .stat-tile .stat-num {
+      font-size: 18px;
+      font-weight: 900;
+      color: #f9f5f0;
+      display: block;
+    }
+
+    .stat-tile .stat-label {
+      font-size: 11px;
+      color: #d6c7b8;
+      font-weight: 600;
+    }
+
+    /* LIVE CUSTOMER NOTIFICATION FEED IN ADMIN */
+    .notif-feed-box {
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .notif-feed-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #f9f5f0;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .notif-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 155px;
+      overflow-y: auto;
+    }
+
+    .notif-item {
+      background: rgba(255, 255, 255, 0.06);
+      border-left: 3px solid var(--whatsapp);
+      border-radius: 5px;
+      padding: 7px 10px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .notif-item.type-view {
+      border-left-color: #f59e0b;
+    }
+
+    .notif-item.type-order {
+      border-left-color: var(--whatsapp);
+      background: rgba(34, 197, 94, 0.12);
+    }
+
+    .notif-item.type-filter {
+      border-left-color: #60a5fa;
+    }
+
+    .notif-msg {
+      color: #f3f4f6;
+      font-weight: 600;
+    }
+
+    .notif-msg strong {
+      color: #fde68a;
+    }
+
+    .notif-time {
+      font-size: 10.5px;
+      color: #9ca3af;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* FLOATING LIVE TOAST ALERT (SHOWS SELLER HOW ALERTS POP UP!) */
+    .live-toast {
+      position: fixed;
+      top: 66px;
+      right: 16px;
+      z-index: 150;
+      background: var(--espresso);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-left: 4px solid var(--whatsapp);
+      border-radius: 10px;
+      padding: 10px 14px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      font-size: 12px;
+      max-width: 310px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      animation: slideInRight 0.25s ease;
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* VIEW COUNTER BADGE ON EACH SHIRT CARD (FOR SELLER ADMIN) */
+    .views-pill-admin {
+      display: none;
+      position: absolute;
+      bottom: 7px;
+      left: 7px;
+      background: rgba(33, 24, 19, 0.9);
+      color: #fde68a;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 4px;
+      z-index: 2;
+    }
+
+    body.seller-mode .views-pill-admin {
+      display: inline-block;
     }
 
     /* COMPACT STORE HEADER + FOMO BAR */
@@ -326,7 +530,7 @@
       border-radius: 99px;
     }
 
-    /* 3. WRAPPED SIZE FILTER BAR (SUPER CLEAN, NO SIDEWAYS OVERFLOW) */
+    /* 3. WRAPPED SIZE FILTER BAR */
     .filter-section {
       margin-top: 10px;
       margin-bottom: 14px;
@@ -406,7 +610,7 @@
       color: #d6c7b8;
     }
 
-    /* 4. SHEIN PRODUCT GRID */
+    /* 4. PRODUCT GRID */
     .product-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -462,7 +666,6 @@
       filter: grayscale(25%) brightness(0.8);
     }
 
-    /* TOP-LEFT DISCOUNT TAG */
     .discount-tag {
       position: absolute;
       top: 7px;
@@ -476,7 +679,6 @@
       z-index: 2;
     }
 
-    /* TOP-RIGHT SIZE BADGE */
     .size-corner-badge {
       position: absolute;
       top: 7px;
@@ -491,7 +693,6 @@
       z-index: 2;
     }
 
-    /* RED SOLD OUT OVERLAY STAMP */
     .sold-red-overlay {
       position: absolute;
       inset: 0;
@@ -528,7 +729,6 @@
       border-radius: 99px;
     }
 
-    /* MINIMAL CARD INFO (NO TEXT CLUTTER) */
     .card-info {
       padding: 9px 10px 10px;
       display: flex;
@@ -579,7 +779,6 @@
       color: var(--sold-red);
     }
 
-    /* BUY BUTTON */
     .shein-buy-btn {
       width: 100%;
       background: var(--espresso);
@@ -605,7 +804,6 @@
       pointer-events: none;
     }
 
-    /* SELLER ADMIN BUTTONS UNDER CARD */
     .seller-controls {
       display: none;
       margin-top: 7px;
@@ -645,7 +843,7 @@
       font-size: 11px;
     }
 
-    /* COMPACT DELIVERY & VIP STRIP (MINIMAL TEXT!) */
+    /* COMPACT DELIVERY & VIP STRIP */
     .quick-info-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -795,7 +993,7 @@
       white-space: nowrap;
     }
 
-    /* FIXED QUICK-VIEW MODAL — SCROLLS SMOOTHLY ON PHONE! */
+    /* QUICK-VIEW MODAL */
     dialog.shein-modal {
       margin: auto;
       background: var(--bg-card);
@@ -973,6 +1171,12 @@
 </head>
 <body>
 
+  <!-- FLOATING NOTIFICATION TOAST (Pops up when customer actions happen while Seller Admin is open!) -->
+  <div id="liveToast" class="live-toast">
+    <span>🔔</span>
+    <div id="liveToastText">Customer viewed a shirt</div>
+  </div>
+
   <!-- 1. SLIM TOP PROMO BAR -->
   <div class="top-promo-bar">
     <span class="top-promo-tag">LIVE DROP</span>
@@ -992,25 +1196,54 @@
 
       <div class="mode-switch">
         <button class="mode-tab active" id="buyerModeBtn" onclick="setMode('buyer')">🛍️ Shop</button>
-        <button class="mode-tab" id="sellerModeBtn" onclick="requestSellerMode()">🔐 Admin</button>
+        <button class="mode-tab" id="sellerModeBtn" onclick="requestSellerMode()">
+          <span>🔐 Admin</span>
+          <span class="notif-count-badge" id="unreadNotifBadge">3</span>
+        </button>
       </div>
     </div>
   </header>
 
   <div class="container">
 
-    <!-- SELLER ADMIN PANEL (UNLOCKS WITH PIN 5350) -->
+    <!-- SELLER ADMIN PANEL + LIVE CUSTOMER NOTIFICATIONS & RADAR (UNLOCKS WITH PIN 5350) -->
     <div class="admin-panel">
-      <div class="admin-panel-info">
-        <h3>
-          <span>⚡ Seller 1-Tap Manager</span>
-          <span class="admin-badge">PIN: 5350</span>
-        </h3>
+      <div class="admin-top-bar">
+        <div class="admin-panel-info">
+          <h3>
+            <span>⚡ Seller Manager & Live Buyer Radar</span>
+            <span class="admin-badge">PIN: 5350</span>
+            <span class="live-radar-badge"><span class="radar-dot"></span> Tracking Clicks Live</span>
+          </h3>
+        </div>
+        <div class="admin-actions">
+          <button class="btn-admin-danger" onclick="clearAllSoldShirts()" id="clearSoldBtn">🧹 Clear Sold</button>
+          <button class="btn-admin-reset" onclick="resetDemoInventory()">↺ Reset</button>
+          <button class="btn-admin-primary" onclick="openModal('addShirtModal')">📸 + Add Shirt</button>
+        </div>
       </div>
-      <div class="admin-actions">
-        <button class="btn-admin-danger" onclick="clearAllSoldShirts()" id="clearSoldBtn">🧹 Clear Sold</button>
-        <button class="btn-admin-reset" onclick="resetDemoInventory()">↺ Reset</button>
-        <button class="btn-admin-primary" onclick="openModal('addShirtModal')">📸 + Add Shirt</button>
+
+      <!-- 4 LIVE ANALYTICS TILES -->
+      <div class="admin-stats-grid" id="adminStatsGrid">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- REAL-TIME CUSTOMER CLICK NOTIFICATIONS FEED -->
+      <div class="notif-feed-box">
+        <div class="notif-feed-header" style="flex-wrap: wrap; gap: 8px;">
+          <span>🔔 Live Customer Activity Notifications</span>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button id="enablePushBtn" onclick="enableDeviceNotifications()" style="background:#22c55e; color:#052e16; border:none; padding:4px 10px; border-radius:4px; font-size:10.5px; font-weight:900; cursor:pointer;">
+              📲 Enable Phone Push Alerts
+            </button>
+            <button onclick="simulateIncomingBuyer()" style="background:rgba(255,255,255,0.14); color:#fde68a; border:1px solid rgba(253,230,138,0.35); padding:4px 9px; border-radius:4px; font-size:10.5px; font-weight:800; cursor:pointer;">
+              ⚡ Test Phone Alert
+            </button>
+          </div>
+        </div>
+        <div class="notif-list" id="adminNotifList">
+          <!-- Populated by JS -->
+        </div>
       </div>
     </div>
 
@@ -1092,7 +1325,7 @@
     </div>
   </div>
 
-  <!-- QUICK-VIEW PRODUCT MODAL (SCROLLABLE ON MOBILE!) -->
+  <!-- QUICK-VIEW PRODUCT MODAL -->
   <dialog id="quickViewModal" class="shein-modal" onclick="if(event.target===this)closeModal('quickViewModal')">
     <div id="quickViewContent"></div>
   </dialog>
@@ -1104,7 +1337,7 @@
       <button onclick="closeModal('pinModal')" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
     </div>
     <p style="font-size:12px; color:var(--brown-sub); margin-bottom:12px;">
-      Enter 4-digit Owner PIN <strong style="color:var(--sold-red);">(Demo: 5350)</strong>
+      Enter 4-digit Owner PIN to view <strong>🔔 Live Buyer Click Notifications</strong> & manage stock <strong style="color:var(--sold-red);">(Demo: 5350)</strong>
     </p>
     <form onsubmit="handlePinSubmit(event)">
       <div class="field">
@@ -1113,7 +1346,7 @@
           Wrong PIN! Try 5350
         </div>
       </div>
-      <button type="submit" class="btn-black-full">Unlock Admin</button>
+      <button type="submit" class="btn-black-full">Unlock Admin & Notifications</button>
     </form>
   </dialog>
 
@@ -1159,7 +1392,8 @@
   <script>
     const WHATSAPP_NUMBER = "233240055350";
     const OWNER_PIN = "5350";
-    const STORAGE_KEY = "fashion_hub_gh_warm_v3";
+    const STORAGE_KEY = "fashion_hub_gh_warm_v4";
+    const NOTIF_STORAGE_KEY = "fashion_hub_gh_notifs_v4";
 
     const chestMeasurements = {
       "S": '19"–20" (Slim/Regular)',
@@ -1179,7 +1413,8 @@
         oldPrice: 120,
         image: "assets/shirt-1.jpg",
         available: true,
-        soldAgo: null
+        soldAgo: null,
+        views: 19
       },
       {
         id: "FH-102",
@@ -1190,7 +1425,8 @@
         oldPrice: 115,
         image: "assets/shirt-2.jpg",
         available: true,
-        soldAgo: null
+        soldAgo: null,
+        views: 14
       },
       {
         id: "FH-103",
@@ -1201,7 +1437,8 @@
         oldPrice: 130,
         image: "assets/shirt-3.jpg",
         available: false,
-        soldAgo: "Sold 14m ago"
+        soldAgo: "Sold 14m ago",
+        views: 31
       },
       {
         id: "FH-104",
@@ -1212,14 +1449,206 @@
         oldPrice: 130,
         image: "assets/shirt-4.jpg",
         available: true,
-        soldAgo: null
+        soldAgo: null,
+        views: 24
       }
     ];
 
+    const initialActivityState = {
+      linkClicks: 48,
+      shirtViews: 88,
+      waOrderClicks: 11,
+      topSize: "M",
+      unreadCount: 3,
+      feed: [
+        {
+          type: "order",
+          html: "💬 Buyer clicked <strong>Buy on WhatsApp</strong> for <strong>Crimson & Navy Plaid Shirt (Size M)</strong>",
+          time: "2m ago"
+        },
+        {
+          type: "view",
+          html: "👀 Customer in Accra inspected <strong>Burgundy Oxford Shirt (Size 2XL)</strong>",
+          time: "6m ago"
+        },
+        {
+          type: "filter",
+          html: "📏 Buyer filtered catalog by <strong>Size M</strong>",
+          time: "9m ago"
+        },
+        {
+          type: "link",
+          html: "🔗 New visitor opened your bio link from <strong>TikTok (@Fashion_hub_gh)</strong>",
+          time: "12m ago"
+        }
+      ]
+    };
+
     let shirts = loadSavedInventory();
+    let activity = loadActivityState();
     let activeSize = "ALL";
     let isSellerUnlocked = false;
     const sizeOrder = ["ALL", "S", "M", "L", "XL", "2XL"];
+
+    function loadSavedInventory() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+      return [...initialShirts];
+    }
+
+    function saveInventory() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(shirts));
+      } catch (e) {}
+    }
+
+    function loadActivityState() {
+      try {
+        const saved = localStorage.getItem(NOTIF_STORAGE_KEY);
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(initialActivityState));
+    }
+
+    function saveActivityState() {
+      try {
+        localStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(activity));
+      } catch (e) {}
+    }
+
+    function logCustomerEvent(type, htmlMessage, toastMessage) {
+      activity.feed.unshift({
+        type,
+        html: htmlMessage,
+        time: "Just now"
+      });
+      if (activity.feed.length > 20) activity.feed.pop();
+
+      if (!document.body.classList.contains("seller-mode")) {
+        activity.unreadCount = (activity.unreadCount || 0) + 1;
+      }
+
+      saveActivityState();
+      renderAdminNotifications();
+      showLiveToast(toastMessage || htmlMessage);
+
+      // Fire real native OS / Phone Push Notification if enabled!
+      const plainText = (toastMessage || htmlMessage).replace(/<[^>]*>?/gm, "");
+      sendNativeDeviceNotification("Fashion Hub Gh — Buyer Alert 🔔", plainText);
+    }
+
+    async function enableDeviceNotifications() {
+      const btn = document.getElementById("enablePushBtn");
+      if (!("Notification" in window)) {
+        alert("On iPhone: Tap Share -> 'Add to Home Screen' first, or we connect instant Telegram/WhatsApp Push Alerts to your phone!");
+        return;
+      }
+      const perm = await Notification.requestPermission();
+      if (perm === "granted") {
+        if (btn) {
+          btn.textContent = "✅ Phone Alerts Active";
+          btn.style.background = "#15803d";
+          btn.style.color = "#fff";
+        }
+        sendNativeDeviceNotification(
+          "Fashion Hub Gh — Alerts Connected! 🔔",
+          "You will now get instant notifications on your device whenever a customer clicks your link or inspects a shirt."
+        );
+      } else {
+        alert("Please allow notifications in your browser settings to receive live phone alerts.");
+      }
+    }
+
+    function sendNativeDeviceNotification(title, bodyText) {
+      if (!("Notification" in window) || Notification.permission !== "granted") return;
+      try {
+        new Notification(title, {
+          body: bodyText,
+          icon: "assets/logo.jpg"
+        });
+      } catch (e) {
+        console.warn("Notification error:", e);
+      }
+    }
+
+    let toastTimer = null;
+    function showLiveToast(htmlMsg) {
+      const toast = document.getElementById("liveToast");
+      const text = document.getElementById("liveToastText");
+      if (!toast || !text) return;
+      text.innerHTML = htmlMsg;
+      toast.style.display = "flex";
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.style.display = "none";
+      }, 3200);
+    }
+
+    function simulateIncomingBuyer() {
+      const cities = ["East Legon, Accra", "Osu, Accra", "Kumasi", "Spintex, Accra", "Madina, Accra"];
+      const randomCity = cities[Math.floor(Math.random() * cities.length)];
+      const randomShirt = shirts[Math.floor(Math.random() * shirts.length)];
+      if (!randomShirt) return;
+
+      randomShirt.views = (randomShirt.views || 10) + 1;
+      activity.shirtViews += 1;
+      activity.linkClicks += 1;
+      saveInventory();
+
+      const msg = `👀 Buyer in <strong>${randomCity}</strong> just checked out <strong>${randomShirt.title} (Size ${randomShirt.size})</strong>`;
+      logCustomerEvent("view", msg, msg);
+      renderCatalog();
+    }
+
+    function trackWaClick(id) {
+      const item = shirts.find(s => s.id === id);
+      if (!item) return;
+      activity.waOrderClicks += 1;
+      const msg = `💬 Buyer tapped <strong>Buy on WhatsApp</strong> for <strong>${item.title} (${item.size})</strong>`;
+      logCustomerEvent("order", msg, msg);
+    }
+
+    function renderAdminNotifications() {
+      const badge = document.getElementById("unreadNotifBadge");
+      if (badge) {
+        badge.textContent = activity.unreadCount > 0 ? activity.unreadCount : "●";
+        badge.style.display = activity.unreadCount > 0 ? "inline-flex" : "none";
+      }
+
+      const statsGrid = document.getElementById("adminStatsGrid");
+      if (statsGrid) {
+        statsGrid.innerHTML = `
+          <div class="stat-tile">
+            <span class="stat-num">🔗 ${activity.linkClicks}</span>
+            <span class="stat-label">Link Clicks Today</span>
+          </div>
+          <div class="stat-tile">
+            <span class="stat-num">👀 ${activity.shirtViews}</span>
+            <span class="stat-label">Shirt Inspections</span>
+          </div>
+          <div class="stat-tile">
+            <span class="stat-num">💬 ${activity.waOrderClicks}</span>
+            <span class="stat-label">WhatsApp Order Taps</span>
+          </div>
+          <div class="stat-tile">
+            <span class="stat-num">📏 Size ${activity.topSize}</span>
+            <span class="stat-label">Most Searched Size</span>
+          </div>
+        `;
+      }
+
+      const list = document.getElementById("adminNotifList");
+      if (list) {
+        list.innerHTML = activity.feed.map(item => `
+          <div class="notif-item type-${item.type}">
+            <span class="notif-msg">${item.html}</span>
+            <span class="notif-time">${item.time}</span>
+          </div>
+        `).join("");
+      }
+    }
 
     function openModal(id) {
       const m = document.getElementById(id);
@@ -1237,29 +1666,27 @@
       document.body.classList.remove("modal-open");
     }
 
-    function loadSavedInventory() {
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) return JSON.parse(saved);
-      } catch (e) {}
-      return [...initialShirts];
-    }
-
-    function saveInventory() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(shirts));
-      } catch (e) {}
-    }
-
     function resetDemoInventory() {
       shirts = [...initialShirts];
+      activity = JSON.parse(JSON.stringify(initialActivityState));
       saveInventory();
+      saveActivityState();
       renderAll();
     }
 
     function openQuickView(id) {
       const item = shirts.find(s => s.id === id);
       if (!item) return;
+
+      // Increment view counter and notify admin!
+      item.views = (item.views || 10) + 1;
+      activity.shirtViews += 1;
+      saveInventory();
+      logCustomerEvent(
+        "view",
+        `👀 Customer inspected <strong>${item.title} (Size ${item.size})</strong>`,
+        `🔔 Admin Alert: Customer viewing <strong>${item.title}</strong>`
+      );
 
       const oldP = item.oldPrice || (item.price + 35);
       const discountPct = Math.round(((oldP - item.price) / oldP) * 100);
@@ -1280,7 +1707,7 @@
           <div class="qv-body">
             <div>
               <div style="font-size:11px; font-weight:800; color:var(--caramel); text-transform:uppercase;">
-                ${item.brand} • ${item.id}
+                ${item.brand} • ${item.id} • 🔥 ${item.views} views today
               </div>
               <h3 style="font-size:17px; font-weight:900; margin:4px 0 8px;">${item.title}</h3>
               <div style="display:flex; align-items:baseline; gap:8px;">
@@ -1308,7 +1735,7 @@
 
             <div>
               ${item.available ? `
-                <a href="${waLink}" target="_blank" class="shein-buy-btn" style="padding:13px; font-size:13px;">
+                <a href="${waLink}" target="_blank" onclick="trackWaClick('${item.id}')" class="shein-buy-btn" style="padding:13px; font-size:13px;">
                   💬 Buy Now on WhatsApp
                 </a>
               ` : `
@@ -1318,6 +1745,7 @@
           </div>
         </div>
       `;
+      renderCatalog();
       openModal("quickViewModal");
     }
 
@@ -1352,6 +1780,9 @@
         document.body.classList.add("seller-mode");
         sellerBtn.classList.add("active");
         buyerBtn.classList.remove("active");
+        activity.unreadCount = 0;
+        saveActivityState();
+        renderAdminNotifications();
       } else {
         document.body.classList.remove("seller-mode");
         buyerBtn.classList.add("active");
@@ -1361,6 +1792,14 @@
 
     function setSizeFilter(size) {
       activeSize = size;
+      if (size !== "ALL") {
+        activity.topSize = size;
+        logCustomerEvent(
+          "filter",
+          `📏 Buyer filtered catalog by <strong>Size ${size}</strong>`,
+          `🔔 Admin Alert: Buyer filtering by <strong>Size ${size}</strong>`
+        );
+      }
       renderAll();
     }
 
@@ -1471,6 +1910,7 @@
               <img src="${item.image}" alt="${item.title}" loading="lazy" />
               <span class="discount-tag">-${discountPct}%</span>
               <span class="size-corner-badge">${item.size}</span>
+              <span class="views-pill-admin">👀 ${item.views || 12} clicks</span>
               ${!item.available ? `
                 <div class="sold-red-overlay">
                   <div class="sold-red-stamp">SOLD OUT</div>
@@ -1493,7 +1933,7 @@
               </div>
 
               ${item.available ? `
-                <a href="${waLink}" target="_blank" class="shein-buy-btn">
+                <a href="${waLink}" target="_blank" onclick="trackWaClick('${item.id}')" class="shein-buy-btn">
                   🛒 Buy on WhatsApp
                 </a>
               ` : `
@@ -1516,6 +1956,7 @@
       renderFomoMeter();
       renderSizePills();
       renderCatalog();
+      renderAdminNotifications();
     }
 
     function handleAddShirt(e) {
@@ -1536,7 +1977,8 @@
           oldPrice: price + 35,
           image: imgUrl,
           available: true,
-          soldAgo: null
+          soldAgo: null,
+          views: 1
         };
         shirts.unshift(newShirt);
         activeSize = "ALL";
