@@ -359,14 +359,95 @@
       border-radius: 99px;
     }
 
-    /* 3. WRAPPED SIZE FILTER BAR */
+    /* 3. SEARCH & WRAPPED SIZE FILTER BAR */
     .filter-section {
       margin-top: 10px;
       margin-bottom: 14px;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 10px 12px;
+      padding: 12px;
+    }
+
+    .search-box-wrap {
+      margin-bottom: 10px;
+    }
+
+    .search-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    .search-label {
+      font-size: 11.5px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--espresso);
+    }
+
+    .search-input-shell {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon-left {
+      position: absolute;
+      left: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--brown-sub);
+      pointer-events: none;
+    }
+
+    .search-icon-left svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      fill: none;
+    }
+
+    .shirt-search-input {
+      width: 100%;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--espresso);
+      background: var(--bg-page);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 38px 10px 36px;
+      min-height: 44px;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .shirt-search-input:focus {
+      outline: 2px solid var(--espresso);
+      outline-offset: 1px;
+      background: #fff;
+      border-color: var(--espresso);
+    }
+
+    .search-clear-btn {
+      position: absolute;
+      right: 8px;
+      background: var(--bg-tan);
+      color: var(--espresso);
+      border: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
     }
 
     .filter-header-row {
@@ -374,6 +455,8 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
     }
 
     .filter-label {
@@ -1053,8 +1136,41 @@
       </div>
     </section>
 
-    <!-- 3. WRAPPED SIZE FILTER BAR -->
+    <!-- 3. SEARCH & WRAPPED SIZE FILTER BAR -->
     <section class="filter-section">
+      <form class="search-box-wrap" action="#" method="GET" onsubmit="event.preventDefault()">
+        <div class="search-label-row">
+          <label for="shirtSearchInput" class="search-label">Search Shirts, Brands or Sizes:</label>
+        </div>
+        <div class="search-input-shell">
+          <span class="search-icon-left" aria-hidden="true">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="7.5"></circle>
+              <line x1="20" y1="20" x2="16.35" y2="16.35"></line>
+            </svg>
+          </span>
+          <input
+            type="search"
+            id="shirtSearchInput"
+            name="q"
+            class="shirt-search-input"
+            placeholder="Search Oxford, Flannel, Primark, XL..."
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            enterkeyhint="search"
+            oninput="handleSearchInput(this.value)"
+          />
+          <button
+            type="button"
+            id="clearSearchBtn"
+            class="search-clear-btn"
+            aria-label="Clear search"
+            onclick="clearSearchInput()"
+          >✕</button>
+        </div>
+      </form>
+
       <div class="filter-header-row">
         <span class="filter-label">Tap Your Size:</span>
         <label class="hide-sold-label">
@@ -1088,7 +1204,7 @@
           <h3>🔥 Next Bale Drop Alert</h3>
           <p>Get notified on WhatsApp 15m before new shirts drop.</p>
         </div>
-        <a class="vip-join-btn" href="https://wa.me/233240055350?text=Hello%20Fashion%20Hub%20Gh!%20Add%20me%20to%20your%20VIP%20Drop%20List." target="_blank">
+        <a class="vip-join-btn" href="https://wa.me/233240055350?text=Hello%20Fashion%20Hub%20Gh!%20Add%20me%20to%20your%20VIP%20Drop%20List." target="_blank" onclick="notifyVipJoinClick()">
           📲 Join VIP List
         </a>
       </aside>
@@ -1191,6 +1307,87 @@
     const VISITS_24H_KEY = "fashion_hub_gh_visits_24h_v1";
     const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
 
+    // ============================================================================
+    // 🔔 LOCK-SCREEN NOTIFICATION ROUTER (DEMO MODE vs. VENDOR SOLD MODE)
+    // - false = Pitching Mode: Sends alerts to YOUR phone ("eakoma-trackstar-alerts")
+    // - true  = Sold Mode: Stops alerting you & alerts THE VENDOR ("fashionhubgh-leads-5350")
+    // ============================================================================
+    const STORE_SOLD_TO_VENDOR = false;
+    const DEVELOPER_NTFY_TOPIC = "eakoma-trackstar-alerts";
+    const VENDOR_NTFY_TOPIC = "fashionhubgh-leads-5350";
+    const NTFY_TOPIC = STORE_SOLD_TO_VENDOR ? VENDOR_NTFY_TOPIC : DEVELOPER_NTFY_TOPIC;
+
+    let lastViewedShirtTitle = "Burgundy Oxford Shirt (2XL)";
+
+    function detectDeviceLabel() {
+      const ua = navigator.userAgent || "";
+      if (/iPhone/i.test(ua)) return "iPhone";
+      if (/iPad/i.test(ua)) return "iPad";
+      if (/Android/i.test(ua)) return "Android Phone";
+      if (/Macintosh/i.test(ua)) return "Mac";
+      if (/Windows/i.test(ua)) return "Windows PC";
+      return "Device";
+    }
+
+    function getUrlRefTag() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const ref = params.get("ref") || params.get("tel") || params.get("v") || params.get("id");
+        return ref ? ` • Ref: ${ref}` : "";
+      } catch (e) {
+        return "";
+      }
+    }
+
+    function sendSilentAlert(title, message, priority = "default", tags = "shirt,eyes") {
+      try {
+        fetch(`https://ntfy.sh/${NTFY_TOPIC}`, {
+          method: "POST",
+          headers: {
+            "Title": title,
+            "Priority": priority,
+            "Tags": tags
+          },
+          body: `${message} • (${detectDeviceLabel()}${getUrlRefTag()})`
+        }).catch(() => {});
+      } catch (e) {}
+    }
+
+    function notifyInitialOpen() {
+      try {
+        const sessionPingKey = "fashion_hub_gh_pinged_session";
+        if (!sessionStorage.getItem(sessionPingKey)) {
+          sessionStorage.setItem(sessionPingKey, "1");
+          sendSilentAlert(
+            "Fashion Hub Gh Store Opened!",
+            "Someone just opened the @Fashion_hub_gh store link right now",
+            "high",
+            "eyes,shirt"
+          );
+        }
+      } catch (e) {}
+    }
+
+    function notifyVipJoinClick() {
+      sendSilentAlert(
+        "📲 Fashion Hub Gh VIP List Clicked!",
+        `Tapped "Join VIP List" (Last viewed: ${lastViewedShirtTitle})`,
+        "urgent",
+        "iphone,fire"
+      );
+    }
+
+    function notifyBuyOnWhatsApp(itemId) {
+      const found = shirts.find(s => s.id === itemId);
+      const label = found ? `${found.title} (${found.size} • GH₵${found.price})` : lastViewedShirtTitle;
+      sendSilentAlert(
+        "🛒 Fashion Hub Gh Buy on WhatsApp Clicked!",
+        `Tapped Buy on WhatsApp for: ${label}`,
+        "urgent",
+        "shopping_cart,shirt"
+      );
+    }
+
     function trackAndGet24hVisits() {
       const now = Date.now();
       let data = { count: 47, windowStart: now };
@@ -1280,8 +1477,38 @@
 
     let shirts = loadSavedInventory();
     let activeSize = "ALL";
+    let searchQuery = "";
     let isSellerUnlocked = false;
     const sizeOrder = ["ALL", "S", "M", "L", "XL", "2XL"];
+
+    function matchesSearch(item) {
+      if (!searchQuery) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        item.title.toLowerCase().includes(q) ||
+        item.brand.toLowerCase().includes(q) ||
+        item.size.toLowerCase().includes(q) ||
+        item.id.toLowerCase().includes(q)
+      );
+    }
+
+    function handleSearchInput(val) {
+      searchQuery = (val || "").trim();
+      const clearBtn = document.getElementById("clearSearchBtn");
+      if (clearBtn) {
+        clearBtn.style.display = searchQuery.length > 0 ? "inline-flex" : "none";
+      }
+      renderAll();
+    }
+
+    function clearSearchInput() {
+      const input = document.getElementById("shirtSearchInput");
+      if (input) {
+        input.value = "";
+        input.focus();
+      }
+      handleSearchInput("");
+    }
 
     function openModal(id) {
       const m = document.getElementById(id);
@@ -1324,8 +1551,16 @@
       if (!item) return;
 
       item.views = (item.views || 10) + 1;
+      lastViewedShirtTitle = `${item.title} (${item.size} • GH₵${item.price})`;
       saveInventory();
       renderCatalog();
+
+      sendSilentAlert(
+        "Shirt Viewed on Fashion Hub Gh",
+        `Tapped Quick-View: ${item.title} (${item.size} - GH₵${item.price})`,
+        "default",
+        "shirt"
+      );
 
       const oldP = item.oldPrice || (item.price + 35);
       const discountPct = Math.round(((oldP - item.price) / oldP) * 100);
@@ -1374,7 +1609,7 @@
 
             <div>
               ${item.available ? `
-                <a href="${waLink}" target="_blank" class="shein-buy-btn" style="padding:13px; font-size:13px;">
+                <a href="${waLink}" target="_blank" class="shein-buy-btn" style="padding:13px; font-size:13px;" onclick="notifyBuyOnWhatsApp('${item.id}')">
                   💬 Buy Now on WhatsApp
                 </a>
               ` : `
@@ -1406,6 +1641,12 @@
         isSellerUnlocked = true;
         closeModal("pinModal");
         setMode("seller");
+        sendSilentAlert(
+          "BINGO! Fashion Hub Gh Unlocked Admin!",
+          "They just entered PIN 5350 and unlocked Seller Mode — call them right now!",
+          "urgent",
+          "rotating_light,lock"
+        );
       } else {
         document.getElementById("pinError").style.display = "block";
       }
@@ -1434,6 +1675,12 @@
       shirts = shirts.map(item => {
         if (item.id === id) {
           const nextAvail = !item.available;
+          sendSilentAlert(
+            "Fashion Hub Gh Tested Mark SOLD!",
+            `Toggled ${item.title} to ${nextAvail ? "AVAILABLE" : "SOLD OUT"}`,
+            "high",
+            "fire"
+          );
           return {
             ...item,
             available: nextAvail,
@@ -1489,6 +1736,7 @@
       container.innerHTML = sizeOrder.map(size => {
         const count = shirts.filter(s => {
           if (hideSold && !s.available) return false;
+          if (!matchesSearch(s)) return false;
           return size === "ALL" ? true : s.size === size;
         }).length;
 
@@ -1511,13 +1759,17 @@
       const filtered = shirts.filter(item => {
         if (hideSold && !item.available) return false;
         if (activeSize !== "ALL" && item.size !== activeSize) return false;
+        if (!matchesSearch(item)) return false;
         return true;
       });
 
       if (filtered.length === 0) {
+        const filterDesc = searchQuery
+          ? `matching "${searchQuery}"${activeSize !== "ALL" ? ` in Size ${activeSize}` : ""}`
+          : `in Size ${activeSize}`;
         grid.innerHTML = `
           <div class="empty-box">
-            <strong>No shirts in Size ${activeSize}.</strong> Tap "All" above!
+            <strong>No shirts found ${filterDesc}.</strong> Tap "All" or clear your search above!
           </div>
         `;
         return;
@@ -1560,7 +1812,7 @@
               </div>
 
               ${item.available ? `
-                <a href="${waLink}" target="_blank" class="shein-buy-btn">
+                <a href="${waLink}" target="_blank" class="shein-buy-btn" onclick="notifyBuyOnWhatsApp('${item.id}')">
                   🛒 Buy on WhatsApp
                 </a>
               ` : `
@@ -1627,6 +1879,7 @@
 
     trackAndGet24hVisits();
     renderAll();
+    notifyInitialOpen();
   </script>
 </body>
 </html>
